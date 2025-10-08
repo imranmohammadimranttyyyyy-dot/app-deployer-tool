@@ -14,75 +14,74 @@ const UploadSection = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setUploading(true);
-
+    
     try {
       const formData = new FormData(e.currentTarget);
-      const appName = formData.get("appName") as string;
-      const version = formData.get("version") as string;
-      const description = formData.get("description") as string;
-      const apkFile = formData.get("apkFile") as File;
-      const iconFile = formData.get("iconFile") as File | null;
-
+      const appName = formData.get('appName') as string;
+      const version = formData.get('version') as string;
+      const description = formData.get('description') as string;
+      const apkFile = formData.get('apkFile') as File;
+      const iconFile = formData.get('iconFile') as File | null;
+      
       if (!apkFile) {
         toast.error("Please select an APK file");
         setUploading(false);
         return;
       }
-
+      
       // Upload APK file
       const apkFileName = `${Date.now()}-${apkFile.name}`;
-      const { data: apkData, error: apkError } = await supabase.storage
-        .from("apk-files")
+      const { error: apkError, data: apkData } = await supabase.storage
+        .from('apk-files')
         .upload(apkFileName, apkFile);
-
+      
       if (apkError) throw apkError;
-
-      // Get public URL for APK
+      
       const { data: { publicUrl: apkUrl } } = supabase.storage
-        .from("apk-files")
+        .from('apk-files')
         .getPublicUrl(apkFileName);
-
+      
       // Upload icon if provided
       let iconUrl = null;
-      if (iconFile) {
+      if (iconFile && iconFile.size > 0) {
         const iconFileName = `${Date.now()}-${iconFile.name}`;
-        const { data: iconData, error: iconError } = await supabase.storage
-          .from("app-icons")
+        const { error: iconError } = await supabase.storage
+          .from('app-icons')
           .upload(iconFileName, iconFile);
-
+        
         if (iconError) throw iconError;
-
+        
         const { data: { publicUrl } } = supabase.storage
-          .from("app-icons")
+          .from('app-icons')
           .getPublicUrl(iconFileName);
         iconUrl = publicUrl;
       }
-
+      
       // Calculate file size in MB
-      const sizeInMB = (apkFile.size / (1024 * 1024)).toFixed(2) + " MB";
-
-      // Insert app data into database
-      const { error: insertError } = await supabase.from("apps").insert({
-        name: appName,
-        version,
-        description,
-        size: sizeInMB,
-        apk_url: apkUrl,
-        icon_url: iconUrl,
-      });
-
-      if (insertError) throw insertError;
-
+      const sizeInMB = (apkFile.size / (1024 * 1024)).toFixed(2);
+      
+      // Save to database
+      const { error: dbError } = await supabase
+        .from('apps')
+        .insert({
+          name: appName,
+          version,
+          description,
+          size: `${sizeInMB} MB`,
+          apk_url: apkUrl,
+          icon_url: iconUrl,
+        });
+      
+      if (dbError) throw dbError;
+      
       toast.success("App uploaded successfully!");
       e.currentTarget.reset();
       
-      // Refresh the page to show the new app
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // Refresh the page to show new app
+      window.location.reload();
     } catch (error: any) {
-      console.error("Upload error:", error);
-      toast.error(error.message || "Failed to upload app");
+      console.error('Upload error:', error);
+      toast.error(`Upload failed: ${error.message}`);
     } finally {
       setUploading(false);
     }
@@ -117,7 +116,7 @@ const UploadSection = () => {
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea 
-                  id="description"
+                  id="description" 
                   name="description"
                   placeholder="Describe your app..." 
                   className="min-h-[100px]"
@@ -128,7 +127,7 @@ const UploadSection = () => {
               <div className="space-y-2">
                 <Label htmlFor="apkFile">APK File</Label>
                 <Input 
-                  id="apkFile"
+                  id="apkFile" 
                   name="apkFile"
                   type="file" 
                   accept=".apk"
@@ -140,7 +139,7 @@ const UploadSection = () => {
                 <Label htmlFor="iconFile">App Icon (Optional)</Label>
                 <Input 
                   id="iconFile"
-                  name="iconFile"
+                  name="iconFile" 
                   type="file" 
                   accept="image/*"
                 />

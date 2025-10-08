@@ -55,7 +55,12 @@ const AppCard = ({ name, description, version, size, downloads, icon, downloadUr
         <Button 
           className="w-full gap-2" 
           style={{ background: "var(--gradient-primary)" }}
-          onClick={() => downloadUrl && window.open(downloadUrl, '_blank')}
+          onClick={() => {
+            if (downloadUrl) {
+              window.location.href = downloadUrl;
+              // Optionally increment download count
+            }
+          }}
         >
           <Download className="w-4 h-4" />
           Download APK
