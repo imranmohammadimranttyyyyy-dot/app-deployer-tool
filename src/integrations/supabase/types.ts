@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      apps: {
+        Row: {
+          apk_url: string
+          created_at: string | null
+          description: string
+          downloads: number | null
+          icon_url: string | null
+          id: string
+          name: string
+          size: string
+          updated_at: string | null
+          version: string
+        }
+        Insert: {
+          apk_url: string
+          created_at?: string | null
+          description: string
+          downloads?: number | null
+          icon_url?: string | null
+          id?: string
+          name: string
+          size: string
+          updated_at?: string | null
+          version: string
+        }
+        Update: {
+          apk_url?: string
+          created_at?: string | null
+          description?: string
+          downloads?: number | null
+          icon_url?: string | null
+          id?: string
+          name?: string
+          size?: string
+          updated_at?: string | null
+          version?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
