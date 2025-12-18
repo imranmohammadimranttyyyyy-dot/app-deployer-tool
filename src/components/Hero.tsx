@@ -1,4 +1,6 @@
-import { Download, Package } from "lucide-react";
+import { Download, Package, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   return (
@@ -7,6 +9,16 @@ const Hero = () => {
         className="absolute inset-0 opacity-10"
         style={{ background: "var(--gradient-primary)" }}
       />
+      
+      {/* Admin Link */}
+      <div className="absolute top-4 right-4 z-20">
+        <Link to="/auth">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <Shield className="w-4 h-4" />
+            Admin
+          </Button>
+        </Link>
+      </div>
       
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center space-y-6">
